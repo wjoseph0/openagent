@@ -26,6 +26,8 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"dayjs": "^1.11.10",
+		"numbro": "^2.4.0",
 		"pdf-lib": "^1.17.1"
 	}
 }
