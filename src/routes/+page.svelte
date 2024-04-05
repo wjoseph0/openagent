@@ -212,11 +212,12 @@
 		// PAGE EIGHT
 
 		const anyAdditionalDisclosuresRadio = offerForm.getRadioGroup('Disclosures (Check one)');
-		anyAdditionalDisclosuresRadio.select('NO Disclosures/Addendums');
+		anyAdditionalDisclosuresRadio.select('NO Disclosures / Addendums');
 
 		// Attaching pre-approval letter
 
 		if (preApprovalFileInput.length >= 1) {
+			anyAdditionalDisclosuresRadio.select('NO Disclosures/Addendums');
 			const disclosuresCheckboxTwo = offerForm.getCheckBox('Disclosures Check (2)');
 			disclosuresCheckboxTwo.check();
 			const disclosuresFieldTwo = offerForm.getTextField('Additional Form (2)');
