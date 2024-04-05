@@ -62,10 +62,10 @@
 	let earnestMoney;
 	let purchasePrice;
 	let propertyState;
+	let preApprovalFileInput = [];
 
 	async function generateOffer() {
-		const templateUrl =
-			'http://localhost:5173/Residential-Purchase-and-Sale-Agreement-Template.pdf';
+		const templateUrl = 'Residential-Purchase-and-Sale-Agreement-Template.pdf';
 		const templatePdfBytes = await fetch(templateUrl).then((res) => res.arrayBuffer());
 		const offerDoc = await PDFDocument.load(templatePdfBytes);
 		const offerForm = offerDoc.getForm();
@@ -212,7 +212,22 @@
 		// PAGE EIGHT
 
 		const anyAdditionalDisclosuresRadio = offerForm.getRadioGroup('Disclosures (Check one)');
-		anyAdditionalDisclosuresRadio.select('NO Disclosures / Addendums');
+		anyAdditionalDisclosuresRadio.select('NO Disclosures/Addendums');
+
+		// Attaching pre-approval letter
+
+		if (preApprovalFileInput.length >= 1) {
+			const disclosuresCheckboxTwo = offerForm.getCheckBox('Disclosures Check (2)');
+			disclosuresCheckboxTwo.check();
+			const disclosuresFieldTwo = offerForm.getTextField('Additional Form (2)');
+			disclosuresFieldTwo.setText('Lender Pre-Approval Letter');
+
+			const preApprovalFileUrl = URL.createObjectURL(preApprovalFileInput[0]);
+			const preApprovalFileBytes = await fetch(preApprovalFileUrl).then((res) => res.arrayBuffer());
+			const preApproval = await PDFDocument.load(preApprovalFileBytes);
+			const preApprovalPages = await offerDoc.copyPages(preApproval, preApproval.getPageIndices());
+			preApprovalPages.forEach((page) => offerDoc.addPage(page));
+		}
 
 		//
 
@@ -226,6 +241,7 @@
 </script>
 
 <form on:submit={generateOffer}>
+	<h1>Offer Generator</h1>
 	<input type="text" placeholder="Buyer Name" bind:value={buyerName} />
 
 	<select bind:value={propertyType}>
@@ -249,6 +265,10 @@
 
 	<input type="number" placeholder="Purchase Price" bind:value={purchasePrice} />
 
+	<p>Pre-Approval Letter Upload</p>
+	<input type="file" bind:files={preApprovalFileInput} />
+
+	<br />
 	<button type="submit">Generate Offer</button>
 </form>
 
