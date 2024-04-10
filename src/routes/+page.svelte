@@ -1,7 +1,14 @@
 <script>
+	import { currentUser, pb } from '$lib/pocketbase.js';
+	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
 	import { PDFDocument } from 'pdf-lib';
 	import dayjs from 'dayjs';
 	import numbro from 'numbro';
+
+	if (browser && !$currentUser) {
+		goto('/auth/login');
+	}
 
 	const usaStatesList = [
 		'Alabama',
@@ -232,7 +239,6 @@
 
 		//
 
-		offerForm.flatten();
 		const offer = await offerDoc.save();
 		const blob = new Blob([offer], { type: 'application/pdf' });
 		const blobUrl = URL.createObjectURL(blob);
