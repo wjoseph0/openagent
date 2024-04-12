@@ -4,7 +4,7 @@
 	import { goto } from '$app/navigation';
 
 	if (browser && $currentUser) {
-		goto('/');
+		goto('/app');
 	}
 
 	let email;
