@@ -288,7 +288,8 @@
 						fields: [{ name: 'buyerSignature', type: 'signature' }]
 					}
 				]
-			}
+			},
+			mode: 'no-cors'
 		})
 			.then(function (response) {
 				console.log(response);
