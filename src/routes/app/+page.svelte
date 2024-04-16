@@ -271,20 +271,21 @@
 
 	async function signOffer(offer) {
 		const fileToken = await pb.files.getToken();
-		const url = pb.files.getUrl(offer, offer.offer, { token: fileToken });
-		await fetch('https://api.docuseal.co/templates/pdf', {
+		const offerUrl = pb.files.getUrl(offer, offer.offer, { token: fileToken });
+		const url = 'https://api.docuseal.co/templates/pdf';
+		const options = {
 			method: 'POST',
 			headers: {
 				'X-Auth-Token': 'MA5kkDwGcfEfLcYFZNc8v1FppZUGAwBvS8bm78acwuz',
 				'content-type': 'application/json'
 			},
-			body: {
+			body: JSON.stringify({
 				name: `${offer.title}_${offer.id}`,
 				external_id: `${offer.id}`,
 				documents: [
 					{
 						name: `offer_${offer.id}`,
-						file: `${btoa(url)}`,
+						file: `${btoa(offerUrl)}`,
 						fields: [
 							{
 								name: 'buyerSignature',
@@ -294,14 +295,12 @@
 						]
 					}
 				]
-			},
-			mode: 'no-cors'
-		})
-			.then(function (response) {
-				console.log(response);
 			})
-			.catch(function (error) {
-				console.error(error);
+		};
+		await fetch(url, options)
+			.then((response) => response.json())
+			.then((data) => {
+				console.log(data);
 			});
 	}
 </script>
