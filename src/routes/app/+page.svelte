@@ -275,7 +275,7 @@
 		await fetch('https://api.docuseal.co/templates/pdf', {
 			method: 'POST',
 			headers: {
-				'X-Auth-Token': 'XKHLctgi4iw3rf7iCCP3HWNVgQnm38snJ3ur5nrZTvY',
+				'X-Auth-Token': 'MA5kkDwGcfEfLcYFZNc8v1FppZUGAwBvS8bm78acwuz',
 				'content-type': 'application/json'
 			},
 			body: {
@@ -284,23 +284,36 @@
 				documents: [
 					{
 						name: `offer_${offer.id}`,
-						file: `${url}`,
-						fields: [{ name: 'buyerSignature', type: 'signature' }]
+						file: `${btoa(url)}`,
+						fields: [
+							{
+								name: 'buyerSignature',
+								type: 'signature',
+								areas: [{ page: 9, x: 2, y: 2, w: 50, h: 50 }]
+							}
+						]
 					}
 				]
 			},
 			mode: 'no-cors'
-		});
-		// .then(function (response) {
-		// 	console.log(response);
-		// })
-		// .catch(function (error) {
-		// 	console.error(error);
-		// });
+		})
+			.then(function (response) {
+				console.log(response);
+			})
+			.catch(function (error) {
+				console.error(error);
+			});
 	}
 </script>
 
 <main>
+	<docuseal-form
+		id="docusealForm"
+		data-src="https://docuseal.co/d/LEVGR9rhZYf86M"
+		data-email="wjoseph0@proton.me"
+		on:completed={(e) => console.log(e.detail)}
+	>
+	</docuseal-form>
 	<form on:submit={createOffer}>
 		<h1>Offer Generator</h1>
 		<input type="text" placeholder="Buyer Name" bind:value={buyerName} />
