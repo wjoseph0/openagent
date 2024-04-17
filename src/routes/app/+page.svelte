@@ -272,21 +272,15 @@
 	async function signOffer(offer) {
 		const fileToken = await pb.files.getToken();
 		const offerUrl = pb.files.getUrl(offer, offer.offer, { token: fileToken });
-		await pb.send('/createDocusealTemplate', {
+		const res = await pb.send('/createDocusealTemplate', {
 			method: 'POST',
 			body: { offerUrl: `${offerUrl}`, offerId: `${offer.id}`, offerTitle: `${offer.title}` }
 		});
+		goto(`/app/sign/${res.slug}/${$currentUser.email}`);
 	}
 </script>
 
 <main>
-	<docuseal-form
-		id="docusealForm"
-		data-src="https://docuseal.co/d/LEVGR9rhZYf86M"
-		data-email="wjoseph0@proton.me"
-		on:completed={(e) => console.log(e.detail)}
-	>
-	</docuseal-form>
 	<form on:submit={createOffer}>
 		<h1>Offer Generator</h1>
 		<input type="text" placeholder="Buyer Name" bind:value={buyerName} />
