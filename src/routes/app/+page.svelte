@@ -272,36 +272,10 @@
 	async function signOffer(offer) {
 		const fileToken = await pb.files.getToken();
 		const offerUrl = pb.files.getUrl(offer, offer.offer, { token: fileToken });
-		const url = 'https://api.docuseal.co/templates/pdf';
-		const options = {
+		await pb.send('/createDocusealTemplate', {
 			method: 'POST',
-			headers: {
-				'X-Auth-Token': 'MA5kkDwGcfEfLcYFZNc8v1FppZUGAwBvS8bm78acwuz',
-				'content-type': 'application/json'
-			},
-			body: JSON.stringify({
-				name: `${offer.title}_${offer.id}`,
-				external_id: `${offer.id}`,
-				documents: [
-					{
-						name: `offer_${offer.id}`,
-						file: `${btoa(offerUrl)}`,
-						fields: [
-							{
-								name: 'buyerSignature',
-								type: 'signature',
-								areas: [{ page: 9, x: 2, y: 2, w: 50, h: 50 }]
-							}
-						]
-					}
-				]
-			})
-		};
-		await fetch(url, options)
-			.then((response) => response.json())
-			.then((data) => {
-				console.log(data);
-			});
+			body: { offerUrl: `${offerUrl}`, offerId: `${offer.id}`, offerTitle: `${offer.title}` }
+		});
 	}
 </script>
 
