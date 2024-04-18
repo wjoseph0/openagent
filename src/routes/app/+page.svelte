@@ -1,7 +1,23 @@
 <script>
+	import { currentUser, pb } from '$lib/pocketbase.js';
+	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
 	import { PDFDocument } from 'pdf-lib';
 	import dayjs from 'dayjs';
 	import numbro from 'numbro';
+	import { onMount } from 'svelte';
+
+	if (browser && !$currentUser) {
+		goto('/auth/login');
+	}
+
+	let offers = [];
+
+	onMount(async function () {
+		offers = await pb.collection('offers').getFullList({
+			sort: '-created'
+		});
+	});
 
 	const usaStatesList = [
 		'Alabama',
@@ -64,7 +80,7 @@
 	let propertyState;
 	let preApprovalFileInput = [];
 
-	async function generateOffer() {
+	async function createOffer() {
 		const templateUrl = 'Residential-Purchase-and-Sale-Agreement-Template.pdf';
 		const templatePdfBytes = await fetch(templateUrl).then((res) => res.arrayBuffer());
 		const offerDoc = await PDFDocument.load(templatePdfBytes);
@@ -232,49 +248,89 @@
 
 		//
 
-		offerForm.flatten();
 		const offer = await offerDoc.save();
 		const blob = new Blob([offer], { type: 'application/pdf' });
-		const blobUrl = URL.createObjectURL(blob);
-		window.open(blobUrl);
-		URL.revokeObjectURL(blobUrl);
+
+		const data = {
+			user: $currentUser.id,
+			title: propertyAddress,
+			offer: blob
+		};
+
+		await pb.collection('offers').create(data);
+		// const blobUrl = URL.createObjectURL(blob);
+		// window.open(blobUrl);
+		// URL.revokeObjectURL(blobUrl);
+	}
+
+	async function viewFile(file) {
+		const fileToken = await pb.files.getToken();
+		const url = pb.files.getUrl(file, file.offer, { token: fileToken });
+		window.open(url);
+	}
+
+	async function signOffer(offer) {
+		const fileToken = await pb.files.getToken();
+		const offerUrl = pb.files.getUrl(offer, offer.offer, { token: fileToken });
+		const res = await pb.send('/createDocusealTemplate', {
+			method: 'POST',
+			body: { offerUrl: `${offerUrl}`, offerId: `${offer.id}`, offerTitle: `${offer.title}` }
+		});
+		goto(`/app/sign/${res.slug}/${$currentUser.email}`);
 	}
 </script>
 
-<form on:submit={generateOffer}>
-	<h1>Offer Generator</h1>
-	<input type="text" placeholder="Buyer Name" bind:value={buyerName} />
+<main>
+	<form on:submit={createOffer}>
+		<h1>Offer Generator</h1>
+		<input type="text" placeholder="Buyer Name" bind:value={buyerName} />
 
-	<select bind:value={propertyType}>
-		<option value="Single-Family" selected>Single-Family</option>
-		<option value="Condominium">Condominium</option>
-		<option value="PUD">Planned Unit Development</option>
-		<option value="Duplex">Duplex</option>
-		<option value="Triplex">Triplex</option>
-		<option value="Fourplex">Fourplex</option>
-	</select>
+		<select bind:value={propertyType}>
+			<option value="Single-Family" selected>Single-Family</option>
+			<option value="Condominium">Condominium</option>
+			<option value="PUD">Planned Unit Development</option>
+			<option value="Duplex">Duplex</option>
+			<option value="Triplex">Triplex</option>
+			<option value="Fourplex">Fourplex</option>
+		</select>
 
-	<input type="text" placeholder="Property Street Address" bind:value={propertyAddress} />
+		<input type="text" placeholder="Property Street Address" bind:value={propertyAddress} />
 
-	<select bind:value={propertyState}>
-		<option value="" selected>-- Property State --</option>
-		{#each usaStatesList as state}
-			<option value={state}>{state}</option>
+		<select bind:value={propertyState}>
+			<option value="" selected>-- Property State --</option>
+			{#each usaStatesList as state}
+				<option value={state}>{state}</option>
+			{/each}
+		</select>
+		<input type="number" placeholder="Earnest Money Amount" bind:value={earnestMoney} />
+
+		<input type="number" placeholder="Purchase Price" bind:value={purchasePrice} />
+
+		<p>Pre-Approval Letter Upload</p>
+		<input type="file" bind:files={preApprovalFileInput} />
+
+		<br />
+		<button type="submit">Generate Offer</button>
+	</form>
+
+	<h1>My Offers</h1>
+	<table>
+		<tr>
+			<th>Title</th>
+			<th>Signed</th>
+			<th>Actions</th>
+		</tr>
+		{#each offers as offer}
+			<tr>
+				<td>{offer.title}</td>
+				<td>{offer.isSigned}</td>
+				<td>
+					<button on:click={viewFile(offer)}>View and Download</button>
+					{#if !offer.isSigned}
+						<button on:click={signOffer(offer)}>View and Sign</button>
+					{/if}
+				</td>
+			</tr>
 		{/each}
-	</select>
-	<input type="number" placeholder="Earnest Money Amount" bind:value={earnestMoney} />
-
-	<input type="number" placeholder="Purchase Price" bind:value={purchasePrice} />
-
-	<p>Pre-Approval Letter Upload</p>
-	<input type="file" bind:files={preApprovalFileInput} />
-
-	<br />
-	<button type="submit">Generate Offer</button>
-</form>
-
-<style>
-	* {
-		display: block;
-	}
-</style>
+	</table>
+</main>
