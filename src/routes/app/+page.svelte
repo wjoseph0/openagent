@@ -263,10 +263,14 @@
 		// URL.revokeObjectURL(blobUrl);
 	}
 
-	async function viewFile(file) {
-		const fileToken = await pb.files.getToken();
-		const url = pb.files.getUrl(file, file.offer, { token: fileToken });
-		window.open(url);
+	async function viewFile(offer) {
+		if (offer.isSigned) {
+			window.open(offer.submissionPage);
+		} else {
+			const fileToken = await pb.files.getToken();
+			const url = pb.files.getUrl(offer, offer.offer, { token: fileToken });
+			window.open(url);
+		}
 	}
 
 	async function signOffer(offer) {
