@@ -5,7 +5,8 @@
 
 	async function updateOfferRecord(p) {
 		const data = {
-			isSigned: true
+			isSigned: true,
+			submissionPage: p.submission_url
 		};
 		await pb.collection('offers').update(`${p.template.external_id}`, data);
 		goto('/app');
@@ -16,7 +17,6 @@
 	data-src="https://docuseal.co/d/{$page.params.template}"
 	data-email={$page.params.email}
 	on:completed={(e) => {
-		console.log(e.detail);
 		updateOfferRecord(e.detail);
 	}}
 >
