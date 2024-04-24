@@ -17,10 +17,6 @@
 		offers = await pb.collection('offers').getFullList({
 			sort: '-created'
 		});
-		const res = await pb.send('/getTemplate', {
-			method: 'GET'
-		});
-		console.log(res);
 	});
 
 	const usaStatesList = [
@@ -267,7 +263,7 @@
 		// URL.revokeObjectURL(blobUrl);
 	}
 
-	async function viewOffer(offer) {
+	async function viewFile(offer) {
 		if (offer.isSigned) {
 			window.open(offer.submissionPage);
 		} else {
@@ -333,7 +329,7 @@
 				<td>{offer.title}</td>
 				<td>{offer.isSigned}</td>
 				<td>
-					<button on:click={viewOffer(offer)}>View and Download</button>
+					<button on:click={viewFile(offer)}>View and Download</button>
 					{#if !offer.isSigned}
 						<button on:click={signOffer(offer)}>View and Sign</button>
 					{/if}
