@@ -12,7 +12,7 @@
 
 	async function login() {
 		await pb.collection('users').authWithPassword(email.toLowerCase(), password);
-		goto('/');
+		goto('/app');
 	}
 </script>
 
