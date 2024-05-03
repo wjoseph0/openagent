@@ -284,57 +284,59 @@
 	}
 </script>
 
-<main>
-	<form on:submit={createOffer}>
-		<h1>Offer Generator</h1>
-		<input type="text" placeholder="Buyer Name" bind:value={buyerName} />
+{#if $currentUser}
+	<main>
+		<form on:submit={createOffer}>
+			<h1>Offer Generator</h1>
+			<input type="text" placeholder="Buyer Name" bind:value={buyerName} />
 
-		<select bind:value={propertyType}>
-			<option value="Single-Family" selected>Single-Family</option>
-			<option value="Condominium">Condominium</option>
-			<option value="PUD">Planned Unit Development</option>
-			<option value="Duplex">Duplex</option>
-			<option value="Triplex">Triplex</option>
-			<option value="Fourplex">Fourplex</option>
-		</select>
+			<select bind:value={propertyType}>
+				<option value="Single-Family" selected>Single-Family</option>
+				<option value="Condominium">Condominium</option>
+				<option value="PUD">Planned Unit Development</option>
+				<option value="Duplex">Duplex</option>
+				<option value="Triplex">Triplex</option>
+				<option value="Fourplex">Fourplex</option>
+			</select>
 
-		<input type="text" placeholder="Property Street Address" bind:value={propertyAddress} />
+			<input type="text" placeholder="Property Street Address" bind:value={propertyAddress} />
 
-		<select bind:value={propertyState}>
-			<option value="" selected>-- Property State --</option>
-			{#each usaStatesList as state}
-				<option value={state}>{state}</option>
-			{/each}
-		</select>
-		<input type="number" placeholder="Earnest Money Amount" bind:value={earnestMoney} />
+			<select bind:value={propertyState}>
+				<option value="" selected>-- Property State --</option>
+				{#each usaStatesList as state}
+					<option value={state}>{state}</option>
+				{/each}
+			</select>
+			<input type="number" placeholder="Earnest Money Amount" bind:value={earnestMoney} />
 
-		<input type="number" placeholder="Purchase Price" bind:value={purchasePrice} />
+			<input type="number" placeholder="Purchase Price" bind:value={purchasePrice} />
 
-		<p>Pre-Approval Letter Upload</p>
-		<input type="file" bind:files={preApprovalFileInput} />
+			<p>Pre-Approval Letter Upload</p>
+			<input type="file" bind:files={preApprovalFileInput} />
 
-		<br />
-		<button type="submit">Generate Offer</button>
-	</form>
+			<br />
+			<button type="submit">Generate Offer</button>
+		</form>
 
-	<h1>My Offers</h1>
-	<table>
-		<tr>
-			<th>Title</th>
-			<th>Signed</th>
-			<th>Actions</th>
-		</tr>
-		{#each offers as offer}
+		<h1>My Offers</h1>
+		<table>
 			<tr>
-				<td>{offer.title}</td>
-				<td>{offer.isSigned}</td>
-				<td>
-					<button on:click={viewFile(offer)}>View and Download</button>
-					{#if !offer.isSigned}
-						<button on:click={signOffer(offer)}>View and Sign</button>
-					{/if}
-				</td>
+				<th>Title</th>
+				<th>Signed</th>
+				<th>Actions</th>
 			</tr>
-		{/each}
-	</table>
-</main>
+			{#each offers as offer}
+				<tr>
+					<td>{offer.title}</td>
+					<td>{offer.isSigned}</td>
+					<td>
+						<button on:click={viewFile(offer)}>View and Download</button>
+						{#if !offer.isSigned}
+							<button on:click={signOffer(offer)}>View and Sign</button>
+						{/if}
+					</td>
+				</tr>
+			{/each}
+		</table>
+	</main>
+{/if}
