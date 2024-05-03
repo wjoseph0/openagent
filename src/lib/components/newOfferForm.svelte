@@ -6,10 +6,13 @@
 
 	let buyerName;
 	let propertyType;
-	let propertyAddress;
+	let propertyStreetAddress;
+	let propertyCity;
+	let propertyState;
+	let propertyZipCode;
+	let taxParcelInformationField;
 	let earnestMoney;
 	let purchasePrice;
-	let propertyState;
 	let preApprovalFileInput = [];
 	const usaStatesList = [
 		'Alabama',
@@ -91,7 +94,12 @@
 		propertyTypeField.select(propertyType);
 
 		const propertyAddressField = offerForm.getTextField('Property Address');
-		propertyAddressField.setText(propertyAddress);
+		propertyAddressField.setText(
+			`${propertyStreetAddress}, ${propertyCity}, ${propertyState}, ${propertyZipCode}`
+		);
+
+		const taxParcelInformationField = offerForm.getTextField('Tax Parcel Information');
+		taxParcelInformationField.setText(propertyTaxParcelNumber);
 
 		const earnestMoneyField = offerForm.getTextField('Earnest Money Deposit');
 		earnestMoneyField.setText(numbro(earnestMoney).format({ thousandSeparated: true }));
@@ -229,7 +237,7 @@
 		// Creating a record in the 'offers' collection
 		const data = {
 			user: $currentUser.id,
-			title: propertyAddress,
+			title: propertyStreetAddress,
 			offer: blob
 		};
 		await pb.collection('offers').create(data);
@@ -241,7 +249,8 @@
 	<input type="text" placeholder="Buyer Name" bind:value={buyerName} />
 
 	<select bind:value={propertyType}>
-		<option value="Single-Family" selected>Single-Family</option>
+		<option value="" selected disabled>Property Type</option>
+		<option value="Single-Family">Single-Family</option>
 		<option value="Condominium">Condominium</option>
 		<option value="PUD">Planned Unit Development</option>
 		<option value="Duplex">Duplex</option>
@@ -249,20 +258,29 @@
 		<option value="Fourplex">Fourplex</option>
 	</select>
 
-	<input type="text" placeholder="Property Street Address" bind:value={propertyAddress} />
+	<input type="text" placeholder="Property Street Address" bind:value={propertyStreetAddress} />
+
+	<input type="text" placeholder="Property City" bind:value={propertyCity} />
 
 	<select bind:value={propertyState}>
-		<option value="" selected>-- Property State --</option>
+		<option value="" selected disabled>Property State</option>
 		{#each usaStatesList as state}
 			<option value={state}>{state}</option>
 		{/each}
 	</select>
+
+	<input type="text" placeholder="Property Zip Code" bind:value={propertyZipCode} />
+
+	<input type="text" placeholder="Property Parcel Number" bind:value={taxParcelInformationField} />
+
 	<input type="number" placeholder="Earnest Money Amount" bind:value={earnestMoney} />
 
 	<input type="number" placeholder="Purchase Price" bind:value={purchasePrice} />
 
-	<p>Pre-Approval Letter Upload</p>
-	<input type="file" bind:files={preApprovalFileInput} />
+	<label>
+		Pre-Approval Letter
+		<input type="file" bind:files={preApprovalFileInput} />
+	</label>
 
 	<br />
 	<button type="submit">Generate Offer</button>
