@@ -29,6 +29,7 @@
 		"dayjs": "^1.11.10",
 		"numbro": "^2.4.0",
 		"pdf-lib": "^1.17.1",
-		"pocketbase": "^0.21.1"
+		"pocketbase": "^0.21.1",
+		"puppeteer": "^22.8.0"
 	}
 }

@@ -15,6 +15,8 @@
 		offers = await pb.collection('offers').getFullList({
 			sort: '-created'
 		});
+
+		await fetch('/api/GetData', { method: 'GET' });
 	});
 
 	async function viewFile(offer) {
